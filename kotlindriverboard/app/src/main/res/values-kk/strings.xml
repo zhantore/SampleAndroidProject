@@ -4,6 +4,6 @@
     <string name="auth_title">Авторизация</string>
     <string name="auth_plate_number_title">Көлік нөмірі *</string>
     <string name="auth_user_name_title">Логинді енгізіңіз *</string>
-    <string name="auth_password_title">Логинді енгізіңіз *</string>
+    <string name="auth_password_title">Құпия сөзді еңгізіңіз *</string>
     <string name="auth_login_button_title">Кіру</string>
 </resources>

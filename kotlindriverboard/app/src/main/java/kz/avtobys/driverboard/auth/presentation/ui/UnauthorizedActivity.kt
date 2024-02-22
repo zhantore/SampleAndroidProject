@@ -217,7 +217,7 @@ fun LoginForm(viewModel: UnauthorizedViewModel? = null) {
 @Preview(
     showSystemUi = true,
     showBackground = true,
-    device = Devices.TABLET
+    device = Devices.TABLET,
 )
 @Composable
 fun GreetingPreview() {
