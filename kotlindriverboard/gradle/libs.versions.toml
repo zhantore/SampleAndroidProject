@@ -159,4 +159,3 @@ maps = [
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "jetbrains_kotlin_version" }
 android-library = { id = "com.android.library", version.ref = "android-library" }
-#navigation-safe-args-gradle-plugin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigationSafeArgsGradlePlugin" }
