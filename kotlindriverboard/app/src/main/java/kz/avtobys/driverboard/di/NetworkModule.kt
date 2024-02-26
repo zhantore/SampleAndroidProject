@@ -36,7 +36,7 @@ val networkModule = module {
     }
     single {
         OAuthTokenInterceptor(
-            securityDataSource = get(),
+            securityLocalCache = get(),
             gson = get(),
         )
     }

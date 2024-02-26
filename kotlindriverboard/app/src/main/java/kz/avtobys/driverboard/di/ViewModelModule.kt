@@ -8,8 +8,8 @@ val viewModelModule = module {
 
     viewModel {
         UnauthorizedViewModel(
-            repository = get(),
-            securityDataSource = get(),
+            authRepository = get(),
+            plateNumberRepository = get(),
         )
     }
 }

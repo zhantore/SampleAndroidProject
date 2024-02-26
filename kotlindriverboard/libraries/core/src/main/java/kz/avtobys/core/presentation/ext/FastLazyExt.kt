@@ -1,4 +1,4 @@
-package kz.avtobys.common.utils
+package kz.avtobys.core.presentation.ext
 
 import kotlin.LazyThreadSafetyMode.NONE
 

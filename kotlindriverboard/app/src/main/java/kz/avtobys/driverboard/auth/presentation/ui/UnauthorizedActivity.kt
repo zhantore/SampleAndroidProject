@@ -44,12 +44,12 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kz.avtobys.common.utils.ext.empty
+import kz.avtobys.core.presentation.ext.empty
+import kz.avtobys.core.presentation.ui.theme.KotlindriverboardTheme
+import kz.avtobys.core.presentation.ui.theme.MontserratTypography
+import kz.avtobys.core.presentation.ui.theme.TextFieldTypography
+import kz.avtobys.core.presentation.ui.theme.primaryColor
 import kz.avtobys.driverboard.R
-import kz.avtobys.driverboard.auth.presentation.theme.KotlindriverboardTheme
-import kz.avtobys.driverboard.auth.presentation.theme.MontserratTypography
-import kz.avtobys.driverboard.auth.presentation.theme.TextFieldTypography
-import kz.avtobys.driverboard.auth.presentation.theme.primaryColor
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class UnauthorizedActivity : ComponentActivity() {

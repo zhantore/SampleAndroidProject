@@ -1,4 +1,4 @@
-package kz.avtobys.driverboard.auth.presentation.theme
+package kz.avtobys.core.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

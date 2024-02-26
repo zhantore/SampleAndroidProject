@@ -2,12 +2,12 @@ package kz.avtobys.driverboard.auth.data.network.interceptor
 
 import android.provider.Telephony
 import com.google.gson.Gson
-import kz.avtobys.common.utils.constants.ApiConstant
-import kz.avtobys.common.utils.constants.ApiConstant.URLS_OF_UNNECESSARY_BEARER_TOKEN_ENDPOINTS
+import kz.avtobys.core.data.constants.ApiConstant
+import kz.avtobys.core.data.constants.ApiConstant.URLS_OF_UNNECESSARY_BEARER_TOKEN_ENDPOINTS
 import kz.avtobys.driverboard.BuildConfig
-import kz.avtobys.driverboard.auth.data.model.AuthRefreshTokenApiModel
-import kz.avtobys.driverboard.auth.data.model.RefreshTokenApiModel
-import kz.avtobys.driverboard.auth.data.network.SecurityDataSource
+import kz.avtobys.driverboard.auth.data.cache.SecurityLocalCache
+import kz.avtobys.driverboard.auth.data.model.AuthTokenResponse
+import kz.avtobys.driverboard.auth.data.model.RefreshTokenRequest
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -17,7 +17,7 @@ import java.net.HttpURLConnection
 
 
 class OAuthTokenInterceptor(
-    private val securityDataSource: SecurityDataSource,
+    private val securityLocalCache: SecurityLocalCache,
     private val gson: Gson,
 ): Interceptor {
 
@@ -30,7 +30,7 @@ class OAuthTokenInterceptor(
 
         // Добавляем токен в запрос
         if (!isUnnecessaryUrl(apiRequest)) {
-            apiRequestBuilder.addOAuthHeader("${Telephony.Carriers.BEARER} ${securityDataSource.getAccessToken()}")
+            apiRequestBuilder.addOAuthHeader("${Telephony.Carriers.BEARER} ${securityLocalCache.getAccessToken()}")
         }
         val response = chain.proceed(apiRequestBuilder.build())
 
@@ -39,7 +39,7 @@ class OAuthTokenInterceptor(
              * При ответе если получаем 401 ошибку
              */
             !isUnnecessaryUrl(apiRequest) && response.code == HttpURLConnection.HTTP_UNAUTHORIZED -> {
-                val refreshToken = securityDataSource.getRefreshToken().orEmpty()
+                val refreshToken = securityLocalCache.getRefreshToken().orEmpty()
 
                 /**
                  * Если рефрешь токен пустой перекидываем на страницу ввода пароля и логина
@@ -52,7 +52,7 @@ class OAuthTokenInterceptor(
                 /**
                  * Формируем модель для refresh token
                  */
-                val refreshTokenBody = RefreshTokenApiModel(
+                val refreshTokenBody = RefreshTokenRequest(
                     refreshToken = refreshToken,
                     grantType = ApiConstant.GRANT_TYPE_REFRESH_TOKEN,
                 )
@@ -77,11 +77,11 @@ class OAuthTokenInterceptor(
                 if (refreshResponse.isSuccessful) {
                     val refreshedToken = gson.fromJson(
                         refreshResponse.body?.string(),
-                        AuthRefreshTokenApiModel::class.java,
+                        AuthTokenResponse::class.java,
                     )
-                    securityDataSource.setAccessToken(refreshedToken.accessToken)
-                    securityDataSource.setRefreshToken(refreshedToken.refreshToken)
-                    securityDataSource.setTokenType(refreshedToken.tokenType)
+                    securityLocalCache.setAccessToken(refreshedToken.accessToken)
+                    securityLocalCache.setRefreshToken(refreshedToken.refreshToken)
+                    securityLocalCache.setTokenType(refreshedToken.tokenType)
                     val accessToken = refreshedToken.accessToken
                     val newCall =
                         apiRequest.newBuilder()
@@ -120,7 +120,7 @@ class OAuthTokenInterceptor(
      * Происходит очистка всех данных о пользователе
      */
     private fun clearAuthorizedUserData() {
-        securityDataSource.clearAuthorizedUserData()
+        securityLocalCache.clearAuthorizedUserData()
     }
 
     /**

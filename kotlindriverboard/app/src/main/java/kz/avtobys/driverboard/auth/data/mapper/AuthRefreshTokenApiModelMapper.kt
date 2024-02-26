@@ -1,13 +1,13 @@
 package kz.avtobys.driverboard.auth.data.mapper
 
 import kz.avtobys.core.domain.mapper.Mapper
-import kz.avtobys.driverboard.auth.data.model.AuthRefreshTokenApiModel
-import kz.avtobys.driverboard.auth.domain.model.AuthRefreshTokenData
+import kz.avtobys.driverboard.auth.data.model.AuthTokenResponse
+import kz.avtobys.driverboard.auth.domain.model.AuthTokenResponseData
 
-class AuthRefreshTokenApiModelMapper : Mapper<AuthRefreshTokenApiModel, AuthRefreshTokenData>() {
+class AuthRefreshTokenApiModelMapper : Mapper<AuthTokenResponse, AuthTokenResponseData>() {
 
-    override fun map(from: AuthRefreshTokenApiModel): AuthRefreshTokenData =
-        AuthRefreshTokenData(
+    override fun map(from: AuthTokenResponse): AuthTokenResponseData =
+        AuthTokenResponseData(
             accessToken = from.accessToken,
             refreshToken = from.refreshToken,
             tokenType = from.tokenType,

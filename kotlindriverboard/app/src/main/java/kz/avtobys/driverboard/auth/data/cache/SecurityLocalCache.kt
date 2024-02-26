@@ -1,8 +1,8 @@
-package kz.avtobys.driverboard.auth.data.network
+package kz.avtobys.driverboard.auth.data.cache
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import kz.avtobys.common.utils.ext.empty
+import kz.avtobys.core.presentation.ext.empty
 
 
 private const val PREF_AUTH_ACCESS_TOKEN = "PREF_AUTH_ACCESS_TOKEN"
@@ -10,8 +10,7 @@ private const val PREF_AUTH_REFRESH_TOKEN = "PREF_AUTH_REFRESH_TOKEN"
 private const val PREF_USER_TOKEN_TYPE = "PREF_USER_TOKEN_TYPE"
 private const val BUS_NUMBER = "BUS_NUMBER"
 
-
-class SecurityDataSource(
+class SecurityLocalCache(
     private val pref: SharedPreferences,
 ) {
 

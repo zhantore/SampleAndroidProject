@@ -4,15 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kz.avtobys.common.utils.ext.empty
-import kz.avtobys.common.utils.ext.isNotNull
+import kz.avtobys.core.presentation.ext.empty
 import kz.avtobys.core.presentation.ext.launchSafe
-import kz.avtobys.driverboard.auth.data.network.SecurityDataSource
 import kz.avtobys.driverboard.auth.domain.repository.AuthRepository
+import kz.avtobys.driverboard.auth.domain.repository.PlateNumberRepository
 
 class UnauthorizedViewModel(
-    private val repository: AuthRepository,
-    private val securityDataSource: SecurityDataSource,
+    private val authRepository: AuthRepository,
+    private val plateNumberRepository: PlateNumberRepository,
 ): ViewModel() {
 
     private var _plateNumber = MutableStateFlow(String.empty)
@@ -26,21 +25,15 @@ class UnauthorizedViewModel(
         viewModelScope.launchSafe(
              onError = {}
         ) {
-            val response = repository.getAccessToken(
+            val response = authRepository.getAccessToken(
                 plateNumber = plateNumber,
                 username = userName,
                 password = password,
             )
-            if (response?.accessToken.isNotNull()) {
-                securityDataSource.setAccessToken(response?.accessToken.orEmpty())
-                securityDataSource.setRefreshToken(response?.refreshToken.orEmpty())
-                securityDataSource.setTokenType(response?.tokenType.orEmpty())
-                securityDataSource.setBusNumber(plateNumber)
-            }
         }
     }
 
     private fun onGetPlateNumber() {
-        _plateNumber.value = securityDataSource.getBusNumber().orEmpty()
+        _plateNumber.value = plateNumberRepository.getPlateNumber()
     }
 }

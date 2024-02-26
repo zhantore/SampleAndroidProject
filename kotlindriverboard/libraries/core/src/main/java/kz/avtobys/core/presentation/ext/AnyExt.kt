@@ -1,4 +1,4 @@
-package kz.avtobys.common.utils.ext
+package kz.avtobys.core.presentation.ext
 
 inline fun <reified T> Any?.castOrNull(): T? {
     return this as? T

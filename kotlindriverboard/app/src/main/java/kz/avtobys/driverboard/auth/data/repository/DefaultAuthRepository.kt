@@ -1,28 +1,34 @@
 package kz.avtobys.driverboard.auth.data.repository
 
-import kz.avtobys.common.utils.constants.ApiConstant.GRANT_TYPE_PASSWORD
+import kz.avtobys.core.data.constants.ApiConstant.GRANT_TYPE_PASSWORD
 import kz.avtobys.driverboard.BuildConfig
+import kz.avtobys.driverboard.auth.data.cache.SecurityLocalCache
 import kz.avtobys.driverboard.auth.data.mapper.AuthRefreshTokenApiModelMapper
 import kz.avtobys.driverboard.auth.data.network.AuthDataSource
-import kz.avtobys.driverboard.auth.domain.model.AuthRefreshTokenData
+import kz.avtobys.driverboard.auth.domain.model.AuthTokenResponseData
 import kz.avtobys.driverboard.auth.domain.repository.AuthRepository
 
 class DefaultAuthRepository(
     private val authDataSource: AuthDataSource,
     private val mapper: AuthRefreshTokenApiModelMapper,
+    private val securityLocalCache: SecurityLocalCache,
 ): AuthRepository {
 
     override suspend fun getAccessToken(
         plateNumber: String,
         username: String,
         password: String,
-    ): AuthRefreshTokenData? {
+    ): AuthTokenResponseData? {
         val response = authDataSource.getAccessToken(
             basicToken = BuildConfig.CLIENT_SECRET,
             grantType = GRANT_TYPE_PASSWORD,
             userName = createLogin(plateNumber),
             password = createPassword(plateNumber),
         )
+        securityLocalCache.setAccessToken(response.body()?.accessToken.orEmpty())
+        securityLocalCache.setRefreshToken(response.body()?.refreshToken.orEmpty())
+        securityLocalCache.setTokenType(response.body()?.tokenType.orEmpty())
+        securityLocalCache.setBusNumber(plateNumber)
         return response.body()?.let { mapper.map(it) }
     }
 

@@ -1,4 +1,4 @@
-package kz.avtobys.common.utils.constants
+package kz.avtobys.core.data.constants
 
 object ApiConstant {
 

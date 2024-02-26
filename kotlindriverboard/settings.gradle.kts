@@ -14,6 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Kotlin-driver-board"
-include ':app'
-include ':libraries:common'
-include ':libraries:core'
+include(":app")
+include(":libraries:core")

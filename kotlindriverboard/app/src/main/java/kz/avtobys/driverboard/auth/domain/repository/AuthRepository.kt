@@ -1,6 +1,6 @@
 package kz.avtobys.driverboard.auth.domain.repository
 
-import kz.avtobys.driverboard.auth.domain.model.AuthRefreshTokenData
+import kz.avtobys.driverboard.auth.domain.model.AuthTokenResponseData
 
 interface AuthRepository {
 
@@ -8,5 +8,5 @@ interface AuthRepository {
         plateNumber: String,
         username: String,
         password: String
-    ): AuthRefreshTokenData?
+    ): AuthTokenResponseData?
 }
