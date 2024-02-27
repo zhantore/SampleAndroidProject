@@ -70,9 +70,9 @@ before_script:
   
 
 stages:          # List of stages for jobs, and their order of execution
-  - build
   - test
   - move-task-to-ready
+  - build
   - move-task-to-test
 
 cache:
@@ -97,14 +97,6 @@ cache:
     - android
   allow_failure: false
   
-build-job:       # This job runs in the build stage, which runs first.
-  stage: build
-  script:
-    - echo "127.0.0.1 $(hostname)" >> /etc/hosts
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint # command to build and debug
-  artifacts: 
-   paths:
-    - ./app/build/outputs/ # set artifact path which store your APK # strange bug with DNS in docker executor
 
 # This job also runs in the test stage.
 test:
@@ -137,17 +129,26 @@ test-jira-task:
   tags:
     - ansible
 
-# test-space-task:
-#   stage: test
-#   script:
-#     - wget -O - "${CI_SCRIPT_URL}/test-space-task.sh" | bash -s ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
-#   when: always
-#   allow_failure: false
-#   only:
-#     - merge_requests
-#   tags:
-#     - ansible
+test-space-task:
+  stage: test
+  script:
+    - wget -O - "${CI_SCRIPT_URL}/test-space-task.sh" | bash -s ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+  when: always
+  allow_failure: false
+  only:
+    - merge_requests
+  tags:
+    - ansible
 
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - echo "127.0.0.1 $(hostname)" >> /etc/hosts
+    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint # command to build and debug
+  artifacts: 
+   paths:
+    - ./app/build/outputs/ # set artifact path which store your APK # strange bug with DNS in docker executor
+    
 move-task-to-ready:
   stage: move-task-to-ready
   when: always
