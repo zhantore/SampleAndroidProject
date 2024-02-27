@@ -61,7 +61,7 @@ test:
   tags:
     - docker
     - android
-  image: cirrusci/android-sdk:34
+  image: cirrusci/android-sdk:30
     
 test-space-task:
   stage: test
@@ -100,12 +100,12 @@ build:
     - echo "sdk.dir="$ANDROID_HOME > local.properties
     - ./gradlew clean
     - ./gradlew assembleBetaRelease
-    - /opt/android-sdk-linux/build-tools/34.0.0/apksigner sign --ks keystore/release-keystore.jks --ks-key-alias avtobysmobile --ks-pass env:'KEY_PASS' --key-pass env:'KEY_PASS' --out av-mobile-terminal-${ENVIRONMENT}.apk app/build/outputs/apk/beta/release/app-beta-release-unsigned.apk
+    - /opt/android-sdk-linux/build-tools/30.0.3/apksigner sign --ks keystore/release-keystore.jks --ks-key-alias avtobysmobile --ks-pass env:'KEY_PASS' --key-pass env:'KEY_PASS' --out av-mobile-terminal-${ENVIRONMENT}.apk app/build/outputs/apk/beta/release/app-beta-release-unsigned.apk
   artifacts:
     expire_in: 14 days
     paths:
       - ./*apk
-  image: cirrusci/android-sdk:34
+  image: cirrusci/android-sdk:30
   when: manual
   retry: 2
 
@@ -128,12 +128,12 @@ build-prod:
     - sed -i "s;OAUTH_API_BASE_URL_PROD;${OAUTH_API_BASE_URL_PROD};g" app/build.gradle
     - ./gradlew clean
     - ./gradlew assemblePilotRelease
-    - /opt/android-sdk-linux/build-tools/34.0.0/apksigner sign --ks keystore/release-keystore.jks --ks-key-alias avtobysmobile --ks-pass env:'KEY_PASS' --key-pass env:'KEY_PASS' --out av-mobile-terminal-prod-${CI_COMMIT_REF_NAME}.apk app/build/outputs/apk/pilot/release/app-pilot-release-unsigned.apk
+    - /opt/android-sdk-linux/build-tools/30.0.3/apksigner sign --ks keystore/release-keystore.jks --ks-key-alias avtobysmobile --ks-pass env:'KEY_PASS' --key-pass env:'KEY_PASS' --out av-mobile-terminal-prod-${CI_COMMIT_REF_NAME}.apk app/build/outputs/apk/pilot/release/app-pilot-release-unsigned.apk
   artifacts:
     expire_in: 7 days
     paths:
       - ./*apk
-  image: cirrusci/android-sdk:34
+  image: cirrusci/android-sdk:30
   when: manual
   retry: 2
   tags:
