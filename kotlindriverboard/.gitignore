@@ -11,7 +11,7 @@ gradle.properties
 
 # Gradle generated files
 .gradle/
-gradle/wrapper/*
+#gradle/wrapper/*
 #gradlew
 #gradlew.bat
 
