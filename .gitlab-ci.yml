@@ -69,7 +69,6 @@ before_script:
   - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
 # Not necessary, but just for surity
   - chmod +x ./gradlew
-  - sudo chmod +x /usr/local/bin/gitlab-runner
   
 
 stages:          # List of stages for jobs, and their order of execution
