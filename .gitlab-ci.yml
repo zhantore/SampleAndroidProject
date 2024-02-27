@@ -1,0 +1,199 @@
+# This file is a template, and might need editing before it works on your project.
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+#
+# You can copy and paste this template into a new `.gitlab-ci.yml` file.
+# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
+#
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+
+image: openjdk:11-jdk
+
+variables:
+  JIRA_PROJECT_NAME: "IF"
+  PROJECT_NAME: "AVTOBYS KOTLIN DRIVER BOARD APP"
+  # Disable the Gradle daemon for Continuous Integration servers as correctness
+  # is usually a priority over speed in CI environments. Using a fresh
+  # runtime for each build is more reliable since the runtime is completely
+  # isolated from any previous builds.
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+  # ANDROID_COMPILE_SDK is the version of Android you're compiling with.
+  # It should match compileSdkVersion.
+  ANDROID_COMPILE_SDK: "34"
+
+  # ANDROID_BUILD_TOOLS is the version of the Android build tools you are using.
+  # It should match buildToolsVersion.
+  ANDROID_BUILD_TOOLS: "34.0.0"
+
+  # It's what version of the command line tools we're going to download from the official site.
+  # Official Site-> https://developer.android.com/studio/index.html
+  # There, look down below at the cli tools only, sdk tools package is of format:
+  #        commandlinetools-os_type-ANDROID_SDK_TOOLS_latest.zip
+  # when the script was last modified for latest compileSdkVersion, it was which is written down below
+  ANDROID_SDK_TOOLS: "7583922"
+
+# Packages installation before running script
+before_script:
+  - apt-get --quiet update --yes
+  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+
+  # Setup path as ANDROID_SDK_ROOT for moving/exporting the downloaded sdk into it
+  - export ANDROID_SDK_ROOT="${PWD}/android-home"
+  # Create a new directory at specified location
+  - install -d $ANDROID_SDK_ROOT
+  # Here we are installing androidSDK tools from official source,
+  # (the key thing here is the url from where you are downloading these sdk tool for command line, so please do note this url pattern there and here as well)
+  # after that unzipping those tools and
+  # then running a series of SDK manager commands to install necessary android SDK packages that'll allow the app to build
+  - wget --output-document=$ANDROID_SDK_ROOT/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+  # move to the archive at ANDROID_SDK_ROOT
+  - pushd $ANDROID_SDK_ROOT
+  - unzip -d cmdline-tools cmdline-tools.zip
+  - pushd cmdline-tools
+  # since commandline tools version 7583922 the root folder is named "cmdline-tools" so we rename it if necessary
+  - mv cmdline-tools tools || true
+  - popd
+  - popd
+  - export PATH=$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/
+
+  # Nothing fancy here, just checking sdkManager version
+  - sdkmanager --version
+
+  # use yes to accept all licenses
+  - yes | sdkmanager --licenses || true
+  - sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
+  - sdkmanager "platform-tools"
+  - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
+
+  # Not necessary, but just for surity
+  - chmod +x ./gradlew
+
+stages:          # List of stages for jobs, and their order of execution
+  - test
+  - move-task-to-ready
+  - build
+  - move-task-to-test
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+# Это называется YAML anchor. Ну или gitlab-ci.yml anchor
+# Позволяет избежать дублирования настроек, что-то вроде наследования
+.branches_template: &branches_template
+  before_script:
+    - if [ $[ $RANDOM % 7 ] == 0 ]; then rm -rf "$CI_PROJECT_DIR/.gradle/caches/*" "$CI_PROJECT_DIR/.gradle/wrapper/*" && echo 'Cleaning mvn cache!!!'; fi
+    - ENVIRONMENT=$(echo "$CI_COMMIT_REF_NAME" | tr a-z A-Z)
+    - if [[ "$ENVIRONMENT" = PAYMENTS ]]; then ENVIRONMENT=ALPHA; fi
+    - ENVIRONMENT_LOWERCASE=$(echo "$ENVIRONMENT" | tr A-Z a-z)
+    - ENVIRONMENT_FIRST_LETTER_UPPER="${ENVIRONMENT_LOWERCASE^}"
+  only:
+    - alpha
+    - beta
+  tags:
+    - docker
+    - android
+  allow_failure: false
+
+
+# This job also runs in the test stage.
+test:
+  before_script:
+    - export GRADLE_USER_HOME=$CI_PROJECT_DIR/.gradle
+  stage: test    # It can run at the same time as unit-test-job (in parallel).
+  when: always
+  script:
+    - echo "127.0.0.1 $(hostname)" >> /etc/hosts
+    - ./gradlew :app:testDevDebugUnitTest
+  allow_failure: false
+  except:
+    - alpha
+    - beta
+    - prod
+  tags:
+    - docker
+    - android
+
+test-jira-task:
+  stage: test
+  script:
+    - wget -O - "${CI_SCRIPT_URL}/test-jira-task.sh" | bash -s AP $CI_COMMIT_REF_NAME
+  when: always
+  allow_failure: true #TODO temporary for development
+  except:
+    - alpha
+    - beta
+    - prod
+  tags:
+    - ansible
+
+test-space-task:
+  stage: test
+  script:
+    - wget -O - "${CI_SCRIPT_URL}/test-space-task.sh" | bash -s ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+  when: always
+  allow_failure: false
+  only:
+    - merge_requests
+  tags:
+    - ansible
+
+move-task-to-ready:
+  stage: move-task-to-ready
+  when: always
+  <<: *branches_template
+  script:
+    - wget -O - "${CI_SCRIPT_URL}/move-task-to-ready.sh" | bash -s IF $CI_COMMIT_REF_NAME
+  tags:
+    - ansible
+
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - echo "127.0.0.1 $(hostname)" >> /etc/hosts
+    - ./gradlew assembleDebug # command to build and debug
+  artifacts: 
+   paths:
+    - ./app/build/outputs/ # set artifact path which store your APK # strange bug with DNS in docker executor
+
+move-task-to-test:
+  stage: move-task-to-test
+  when: on_success
+  <<: *branches_template
+  only:
+    - alpha
+    - beta
+  script:
+    - echo $ENVIRONMENT
+    - wget -O - "${CI_SCRIPT_URL}/move-task-to-test.sh" | bash -s IF $ENVIRONMENT
+  tags:
+    - ansible
+
+build-prod:
+  stage: build
+  script:
+    - echo "127.0.0.1 $(hostname)" >> /etc/hosts # strange bug with DNS in docker executor
+    - ./gradlew assembleDebug # command to build and debug
+  artifacts:
+    expire_in: 42 days
+    paths:
+      - ./*apk
+  when: manual
+  retry: 2
+  tags:
+    - docker
+    - android
+  allow_failure: false
+
+
