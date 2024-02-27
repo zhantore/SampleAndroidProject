@@ -1,6 +1,6 @@
 package kz.avtobys.driverboard.auth.domain.repository
 
-interface RefreshTokenRepository {
+interface IRefreshTokenRepository {
 
     fun getRefreshTokenRepository(): String
 }

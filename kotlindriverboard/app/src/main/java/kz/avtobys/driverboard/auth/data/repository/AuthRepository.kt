@@ -6,13 +6,13 @@ import kz.avtobys.driverboard.auth.data.cache.SecurityLocalCache
 import kz.avtobys.driverboard.auth.data.mapper.AuthRefreshTokenApiModelMapper
 import kz.avtobys.driverboard.auth.data.network.AuthDataSource
 import kz.avtobys.driverboard.auth.domain.model.AuthTokenResponseData
-import kz.avtobys.driverboard.auth.domain.repository.AuthRepository
+import kz.avtobys.driverboard.auth.domain.repository.IAuthRepository
 
-class DefaultAuthRepository(
+class AuthRepository(
     private val authDataSource: AuthDataSource,
     private val mapper: AuthRefreshTokenApiModelMapper,
     private val securityLocalCache: SecurityLocalCache,
-): AuthRepository {
+): IAuthRepository {
 
     override suspend fun getAccessToken(
         plateNumber: String,

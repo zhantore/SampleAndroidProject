@@ -1,11 +1,11 @@
 package kz.avtobys.driverboard.auth.data.repository
 
 import kz.avtobys.driverboard.auth.data.cache.SecurityLocalCache
-import kz.avtobys.driverboard.auth.domain.repository.PlateNumberRepository
+import kz.avtobys.driverboard.auth.domain.repository.IPlateNumberRepository
 
-class DefaultPlateNumberRepository(
+class PlateNumberRepository(
     private val securityLocalCache: SecurityLocalCache,
-): PlateNumberRepository {
+): IPlateNumberRepository {
 
     override fun getPlateNumber(): String {
         return securityLocalCache.getBusNumber().orEmpty()

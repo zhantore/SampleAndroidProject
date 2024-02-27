@@ -1,11 +1,11 @@
 package kz.avtobys.driverboard.auth.data.repository
 
 import kz.avtobys.driverboard.auth.data.cache.SecurityLocalCache
-import kz.avtobys.driverboard.auth.domain.repository.RefreshTokenRepository
+import kz.avtobys.driverboard.auth.domain.repository.IRefreshTokenRepository
 
-class DefaultRefreshTokenRepository(
+class RefreshTokenRepository(
     private val securityLocalCache: SecurityLocalCache,
-): RefreshTokenRepository {
+): IRefreshTokenRepository {
 
     override fun getRefreshTokenRepository(): String {
         return securityLocalCache.getRefreshToken().orEmpty()

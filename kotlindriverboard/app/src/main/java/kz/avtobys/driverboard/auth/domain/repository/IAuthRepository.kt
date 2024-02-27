@@ -2,7 +2,7 @@ package kz.avtobys.driverboard.auth.domain.repository
 
 import kz.avtobys.driverboard.auth.domain.model.AuthTokenResponseData
 
-interface AuthRepository {
+interface IAuthRepository {
 
     suspend fun getAccessToken(
         plateNumber: String,

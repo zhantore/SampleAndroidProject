@@ -1,11 +1,11 @@
 package kz.avtobys.driverboard.auth.data.repository
 
 import kz.avtobys.driverboard.auth.data.cache.SecurityLocalCache
-import kz.avtobys.driverboard.auth.domain.repository.AccessTokenRepository
+import kz.avtobys.driverboard.auth.domain.repository.IAccessTokenRepository
 
-class DefaultAccessTokenRepository(
+class AccessTokenRepository(
     private val securityLocalCache: SecurityLocalCache,
-): AccessTokenRepository {
+): IAccessTokenRepository {
 
     override fun getAccessTokenRepository(): String {
         return securityLocalCache.getAccessToken().orEmpty()

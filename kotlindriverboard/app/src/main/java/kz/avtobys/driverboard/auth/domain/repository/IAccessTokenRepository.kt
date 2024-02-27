@@ -1,6 +1,6 @@
 package kz.avtobys.driverboard.auth.domain.repository
 
-interface AccessTokenRepository {
+interface IAccessTokenRepository {
 
     fun getAccessTokenRepository(): String
 }

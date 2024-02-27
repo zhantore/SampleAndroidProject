@@ -6,12 +6,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kz.avtobys.core.presentation.ext.empty
 import kz.avtobys.core.presentation.ext.launchSafe
-import kz.avtobys.driverboard.auth.domain.repository.AuthRepository
-import kz.avtobys.driverboard.auth.domain.repository.PlateNumberRepository
+import kz.avtobys.driverboard.auth.domain.repository.IAuthRepository
+import kz.avtobys.driverboard.auth.domain.repository.IPlateNumberRepository
 
 class UnauthorizedViewModel(
-    private val authRepository: AuthRepository,
-    private val plateNumberRepository: PlateNumberRepository,
+    private val IAuthRepository: IAuthRepository,
+    private val IPlateNumberRepository: IPlateNumberRepository,
 ): ViewModel() {
 
     private var _plateNumber = MutableStateFlow(String.empty)
@@ -25,7 +25,7 @@ class UnauthorizedViewModel(
         viewModelScope.launchSafe(
              onError = {}
         ) {
-            val response = authRepository.getAccessToken(
+            val response = IAuthRepository.getAccessToken(
                 plateNumber = plateNumber,
                 username = userName,
                 password = password,
@@ -34,6 +34,6 @@ class UnauthorizedViewModel(
     }
 
     private fun onGetPlateNumber() {
-        _plateNumber.value = plateNumberRepository.getPlateNumber()
+        _plateNumber.value = IPlateNumberRepository.getPlateNumber()
     }
 }

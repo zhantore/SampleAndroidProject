@@ -1,6 +1,6 @@
 package kz.avtobys.driverboard.auth.domain.repository
 
-interface PlateNumberRepository {
+interface IPlateNumberRepository {
 
     fun getPlateNumber(): String
 }
