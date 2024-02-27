@@ -16,6 +16,8 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
+image: openjdk:11-jdk
+
 variables:
   JIRA_PROJECT_NAME: "IF"
   PROJECT_NAME: "AVTOBYS KOTLIN DRIVER BOARD APP"
@@ -93,7 +95,6 @@ cache:
     - alpha
     - beta
   tags:
-    - docker
     - android
   allow_failure: false
   
@@ -113,7 +114,6 @@ test:
     - beta
     - prod
   tags:
-    - docker
     - android
     
 test-jira-task:
@@ -183,7 +183,6 @@ build-prod:
   when: manual
   retry: 2
   tags:
-    - docker
     - android
   allow_failure: false
 
