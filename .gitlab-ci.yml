@@ -51,7 +51,7 @@ test:
   when: always
   script:
     - echo "sdk.dir="$ANDROID_HOME > local.properties
-    - ./gradlew clean
+    # - ./gradlew clean
     - ./gradlew assembleBetaDevDebug
   allow_failure: false
   except:
