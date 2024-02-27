@@ -24,6 +24,7 @@ cache:
 # Позволяет избежать дублирования настроек, что-то вроде наследования
 .branches_template: &branches_template
   before_script:
+    - chmod +x ./gradlew
     - if [[ -n ${BUILD_FROM_COMMIT} ]]; then ENVIRONMENT=BETA; fi
     - export GRADLE_USER_HOME=$CI_PROJECT_DIR/.gradle
     - if [ $[ $RANDOM % 7 ] == 0 ]; then rm -rf "$CI_PROJECT_DIR/.gradle/caches/*" "$CI_PROJECT_DIR/.gradle/wrapper/*" && echo 'Cleaning mvn cache!!!'; fi
@@ -51,7 +52,7 @@ test:
   when: always
   script:
     - echo "sdk.dir="$ANDROID_HOME > local.properties
-    # - ./gradlew clean
+    - ./gradlew clean
     - ./gradlew assembleBetaDevDebug
   allow_failure: false
   except:
