@@ -58,29 +58,29 @@ android {
         create("alpha") {
             dimension = "default"
             applicationId = "kz.avtobys.driverboard.alpha"
-            buildConfigField("String", "app_name", "\"Avtobys Driver Board ALPHA\"")
-            buildConfigField("String", "CLIENT_SECRET", "\"Basic Y2xpZW50OnNlY3JldA==\"")
-            buildConfigField("String", "PASS_SECRET", "\"test\"")
-            buildConfigField("String", "OAUTH_API_BASE_URL", "\"https://api.alpha.avtobys.kz\"")
-            buildConfigField("String", "WEB_VIEW_URL", "\"https://driver.alpha.avtobys.kz\"")
+            buildConfigField("String", "app_name_alpha", "\"app_name_alpha\"")
+            buildConfigField("String", "CLIENT_SECRET", "\"CLIENT_SECRET\"")
+            buildConfigField("String", "PASS_SECRET", "\"PASS_SECRET\"")
+            buildConfigField("String", "OAUTH_API_BASE_URL", "\"OAUTH_API_BASE_URL\"")
+            buildConfigField("String", "WEB_VIEW_URL", "\"WEB_VIEW_URL\"")
         }
         create("beta") {
             dimension = "default"
             applicationId = "kz.avtobys.driverboard.beta"
-            buildConfigField("String", "app_name", "\"Avtobys Driver Board BETA\"")
-            buildConfigField("String", "CLIENT_SECRET", "\"Basic Y2xpZW50OnNlY3JldA==\"")
-            buildConfigField("String", "PASS_SECRET", "\"test\"")
-            buildConfigField("String", "OAUTH_API_BASE_URL", "\"https://api.beta.avtobys.kz\"")
-            buildConfigField("String", "WEB_VIEW_URL", "\"https://driver.beta.avtobys.kz\"")
+            buildConfigField("String", "app_name_beta", "\"app_name_beta\"")
+            buildConfigField("String", "CLIENT_SECRET", "\"CLIENT_SECRET\"")
+            buildConfigField("String", "PASS_SECRET", "\"PASS_SECRET\"")
+            buildConfigField("String", "OAUTH_API_BASE_URL_BETA", "\"OAUTH_API_BASE_URL_BETA\"")
+            buildConfigField("String", "WEB_VIEW_URL", "\"WEB_VIEW_URL_BETA\"")
         }
         create("prod") {
             dimension = "default"
             applicationId = "kz.avtobys.driverboard"
-            buildConfigField("String", "app_name", "\"Avtobys Driver Board\"")
-            buildConfigField("String", "CLIENT_SECRET", "\"Basic YmIxeUFtWTpwaGhtMjFFVGpCb1FrbE5KMHExVnhn\"")
-            buildConfigField("String", "PASS_SECRET", "\"pujAJEZ7CBV\"")
-            buildConfigField("String", "OAUTH_API_BASE_URL", "\"https://api.avtobys.kz\"")
-            buildConfigField("String", "WEB_VIEW_URL", "\"https://driver2.avtobys.kz/\"")
+            buildConfigField("String", "app_name_prod", "\"app_name_prod\"")
+            buildConfigField("String", "CLIENT_SECRET_PROD", "\"CLIENT_SECRET_PROD\"")
+            buildConfigField("String", "PASS_SECRET_PROD", "\"PASS_SECRET_PROD\"")
+            buildConfigField("String", "OAUTH_API_BASE_URL_PROD", "\"OAUTH_API_BASE_URL_PROD\"")
+            buildConfigField("String", "WEB_VIEW_URL", "\"WEB_VIEW_URL_PROD\"")
         }
     }
 }
