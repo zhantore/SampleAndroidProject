@@ -16,8 +16,6 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
-image: openjdk:11-jdk
-
 variables:
   JIRA_PROJECT_NAME: "IF"
   PROJECT_NAME: "AVTOBYS KOTLIN DRIVER BOARD APP"
