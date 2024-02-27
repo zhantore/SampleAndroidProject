@@ -24,49 +24,6 @@ variables:
   # runtime for each build is more reliable since the runtime is completely
   # isolated from any previous builds.
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
-  # ANDROID_COMPILE_SDK is the version of Android you're compiling with.
-  # It should match compileSdkVersion.
-  ANDROID_COMPILE_SDK: "34"
-
-  # ANDROID_BUILD_TOOLS is the version of the Android build tools you are using.
-  # It should match buildToolsVersion.
-  ANDROID_BUILD_TOOLS: "34.0.0"
-
-  # It's what version of the command line tools we're going to download from the official site.
-  # Official Site-> https://developer.android.com/studio/index.html
-  # There, look down below at the cli tools only, sdk tools package is of format:
-  #        commandlinetools-os_type-ANDROID_SDK_TOOLS_latest.zip
-  # when the script was last modified for latest compileSdkVersion, it was which is written down below
-  ANDROID_SDK_TOOLS: "9477386"
-
-# Packages installation before running script
-before_script:
-  - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget unzip
-
-  # Setup path as ANDROID_SDK_ROOT for moving/exporting the downloaded sdk into it
-  - export ANDROID_HOME="${PWD}/android-home"
-  # Create a new directory at specified location
-  - install -d $ANDROID_HOME
-  # Here we are installing androidSDK tools from official source,
-  # (the key thing here is the url from where you are downloading these sdk tool for command line, so please do note this url pattern there and here as well)
-  # after that unzipping those tools and
-  # then running a series of SDK manager commands to install necessary android SDK packages that'll allow the app to build
-  - wget --no-verbose --output-document=$ANDROID_HOME/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-  - unzip -q -d "$ANDROID_HOME/cmdline-tools" "$ANDROID_HOME/cmdline-tools.zip"
-  - mv -T "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/tools"
-  - export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/cmdline-tools/tools/bin
-  # Nothing fancy here, just checking sdkManager version
-  - sdkmanager --version
-
-  # use yes to accept all licenses
-  - yes | sdkmanager --licenses > /dev/null || true
-  - sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
-  - sdkmanager "platform-tools"
-  - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
-# Not necessary, but just for surity
-  - chmod +x ./gradlew
   
 
 stages:          # List of stages for jobs, and their order of execution
@@ -84,9 +41,13 @@ cache:
 # Позволяет избежать дублирования настроек, что-то вроде наследования
 .branches_template: &branches_template
   before_script:
+    - if [[ -n ${BUILD_FROM_COMMIT} ]]; then ENVIRONMENT=BETA; fi
+    - export GRADLE_USER_HOME=$CI_PROJECT_DIR/.gradle
     - if [ $[ $RANDOM % 7 ] == 0 ]; then rm -rf "$CI_PROJECT_DIR/.gradle/caches/*" "$CI_PROJECT_DIR/.gradle/wrapper/*" && echo 'Cleaning mvn cache!!!'; fi
     - ENVIRONMENT=$(echo "$CI_COMMIT_REF_NAME" | tr a-z A-Z)
-    - if [[ "$ENVIRONMENT" = PAYMENTS ]]; then ENVIRONMENT=ALPHA; fi
+    - if [[ "$ENVIRONMENT" = ALPHA ]]; then ENVIRONMENT=ALPHA; BASE_URL=https://api.alpha.avtobys.kz; fi
+    - if [[ "$ENVIRONMENT" = BETA ]]; then ENVIRONMENT=BETA; BASE_URL=https://api.beta.avtobys.kz; fi
+    - if [[ -n ${BUILD_FROM_COMMIT} ]]; then ENVIRONMENT=BETA; git reset --hard; git checkout ${BUILD_FROM_COMMIT}; fi ## to build any commit
     - ENVIRONMENT_LOWERCASE=$(echo "$ENVIRONMENT" | tr A-Z a-z)
     - ENVIRONMENT_FIRST_LETTER_UPPER="${ENVIRONMENT_LOWERCASE^}"
   only:
@@ -99,54 +60,41 @@ cache:
 
 # This job also runs in the test stage.
 test:
-  before_script:
-    - export GRADLE_USER_HOME=$CI_PROJECT_DIR/.gradle
+  <<: *branches_template
+  only:
+    - /.*/
+    - merge_requests
   stage: test    # It can run at the same time as unit-test-job (in parallel).
   when: always
   script:
-    - echo "127.0.0.1 $(hostname)" >> /etc/hosts
-    - ./gradlew :app:testAlphaDebugUnitTest
+    - echo "sdk.dir="$ANDROID_HOME > local.properties
+    - ./gradlew clean
+    - ./gradlew assembleBetaDevDebug
   allow_failure: false
   except:
     - alpha
     - beta
     - prod
   tags:
+    - docker
     - android
+  image: cirrusci/android-sdk:34
     
-test-jira-task:
-  stage: test
-  script:
-    - wget -O - "${CI_SCRIPT_URL}/test-jira-task.sh" | bash -s AP $CI_COMMIT_REF_NAME
-  when: always
-  allow_failure: true #TODO temporary for development
-  except:
-    - alpha
-    - beta
-    - prod
-  tags:
-    - ansible
-
 test-space-task:
   stage: test
   script:
     - wget -O - "${CI_SCRIPT_URL}/test-space-task.sh" | bash -s ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
   when: always
   allow_failure: false
+  except:
+    - alpha
+    - beta
+    - prod
   only:
     - merge_requests
   tags:
     - ansible
 
-build-job:       # This job runs in the build stage, which runs first.
-  stage: build
-  script:
-    - echo "127.0.0.1 $(hostname)" >> /etc/hosts
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint # command to build and debug
-  artifacts: 
-   paths:
-    - ./app/build/outputs/ # set artifact path which store your APK # strange bug with DNS in docker executor
-    
 move-task-to-ready:
   stage: move-task-to-ready
   when: always
@@ -156,15 +104,33 @@ move-task-to-ready:
   tags:
     - ansible
 
+build:
+  stage: build
+  <<: *branches_template
+  script:
+    - export CLIENT_SECRET='Y2xpZW50OnNlY3JldA=='
+    - export PASS_SECRET='test'
+    - sed -i "s;CLIENT_SECRET;${CLIENT_SECRET};g" app/build.gradle
+    - sed -i "s;PASS_SECRET;${PASS_SECRET};g" app/build.gradle
+    - sed -i "s;OAUTH_API_BASE_URL;${OAUTH_API_BASE_URL};g" app/build.gradle
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+    - echo "sdk.dir="$ANDROID_HOME > local.properties
+    - ./gradlew clean
+    - ./gradlew assembleBetaRelease
+    - /opt/android-sdk-linux/build-tools/34.0.0/apksigner sign --ks keystore/release-keystore.jks --ks-key-alias avtobysmobile --ks-pass env:'KEY_PASS' --key-pass env:'KEY_PASS' --out av-mobile-terminal-${ENVIRONMENT}.apk app/build/outputs/apk/beta/release/app-beta-release-unsigned.apk
+  artifacts:
+    expire_in: 14 days
+    paths:
+      - ./*apk
+  image: cirrusci/android-sdk:34
+  when: manual
+  retry: 2
+
 move-task-to-test:
   stage: move-task-to-test
   when: on_success
   <<: *branches_template
-  only:
-    - alpha
-    - beta
   script:
-    - echo $ENVIRONMENT
     - wget -O - "${CI_SCRIPT_URL}/move-task-to-test.sh" | bash -s IF $ENVIRONMENT
   tags:
     - ansible
@@ -172,16 +138,26 @@ move-task-to-test:
 build-prod:
   stage: build
   script:
-    - echo "127.0.0.1 $(hostname)" >> /etc/hosts # strange bug with DNS in docker executor
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint # command to build and debug
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+    - echo "sdk.dir="$ANDROID_HOME > local.properties
+    - sed -i "s;PASS_SECRET_PROD;${PASS_SECRET_PROD};g" app/build.gradle
+    - sed -i "s;CLIENT_SECRET_PROD;${CLIENT_SECRET_PROD};g" app/build.gradle
+    - sed -i "s;OAUTH_API_BASE_URL_PROD;${OAUTH_API_BASE_URL_PROD};g" app/build.gradle
+    - ./gradlew clean
+    - ./gradlew assemblePilotRelease
+    - /opt/android-sdk-linux/build-tools/34.0.0/apksigner sign --ks keystore/release-keystore.jks --ks-key-alias avtobysmobile --ks-pass env:'KEY_PASS' --key-pass env:'KEY_PASS' --out av-mobile-terminal-prod-${CI_COMMIT_REF_NAME}.apk app/build/outputs/apk/pilot/release/app-pilot-release-unsigned.apk
   artifacts:
-    expire_in: 42 days
+    expire_in: 7 days
     paths:
       - ./*apk
+  image: cirrusci/android-sdk:34
   when: manual
   retry: 2
   tags:
+    - docker
     - android
   allow_failure: false
+  only:
+    - tags
 
 
