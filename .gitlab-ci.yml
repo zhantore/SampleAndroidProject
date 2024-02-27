@@ -106,7 +106,7 @@ test:
   when: always
   script:
     - echo "127.0.0.1 $(hostname)" >> /etc/hosts
-    - ./gradlew :app:testDevDebugUnitTest
+    - ./gradlew :app:testAlphaDebugUnitTest
   allow_failure: false
   except:
     - alpha
