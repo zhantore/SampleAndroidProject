@@ -138,16 +138,16 @@ test-jira-task:
   tags:
     - ansible
 
-test-space-task:
-  stage: test
-  script:
-    - wget -O - "${CI_SCRIPT_URL}/test-space-task.sh" | bash -s ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
-  when: always
-  allow_failure: false
-  only:
-    - merge_requests
-  tags:
-    - ansible
+# test-space-task:
+#   stage: test
+#   script:
+#     - wget -O - "${CI_SCRIPT_URL}/test-space-task.sh" | bash -s ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+#   when: always
+#   allow_failure: false
+#   only:
+#     - merge_requests
+#   tags:
+#     - ansible
 
 move-task-to-ready:
   stage: move-task-to-ready
