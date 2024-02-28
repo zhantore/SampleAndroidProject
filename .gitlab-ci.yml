@@ -36,7 +36,7 @@ cache:
     - if [[ -n ${BUILD_FROM_COMMIT} ]]; then ENVIRONMENT=BETA; git reset --hard; git checkout ${BUILD_FROM_COMMIT}; fi ## to build any commit
     - ENVIRONMENT_LOWERCASE=$(echo "$ENVIRONMENT" | tr A-Z a-z)
     - ENVIRONMENT_FIRST_LETTER_UPPER="${ENVIRONMENT_LOWERCASE^}"
-    - chmod +x ./gradlew
+    # - chmod +x ./gradlew
   only:
     - alpha
     - beta
