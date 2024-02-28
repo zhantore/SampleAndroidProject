@@ -14,6 +14,9 @@ variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   CI_SCRIPT_URL: "https://git-server.innoforce.kz/innopay/innoforce-ci-scripts/raw/v2.3"
 
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  
 cache:
   key: ${CI_PROJECT_ID}
   paths:
