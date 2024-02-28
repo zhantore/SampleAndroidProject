@@ -65,7 +65,7 @@ test:
   tags:
     - docker
     - android
-  image: cirrusci/android-sdk:30
+  image: cirrusci/android-sdk:33
     
 test-space-task:
   stage: test
