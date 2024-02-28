@@ -11,9 +11,11 @@ gradle.properties
 
 # Gradle generated files
 .gradle/
-#gradle/wrapper/*
-#gradlew
-#gradlew.bat
+gradle/wrapper/*
+gradlew
+gradlew.bat
 
 # User-specific configurations
 /.idea
+release-keystore.jks
+release-keystore.properties
