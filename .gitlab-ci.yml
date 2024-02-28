@@ -17,7 +17,7 @@ before_script:
   - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
   - chmod +x ./gradlew
 
-  stages:
+stages:
   - build
   - test
 
