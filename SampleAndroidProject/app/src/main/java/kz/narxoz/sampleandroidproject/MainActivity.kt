@@ -61,6 +61,7 @@ private const val TAG = "MainActivity"
 class MainActivity : ComponentActivity() {
 
     private lateinit var sampleService: Intent
+    private lateinit var volumeService: Intent
     private lateinit var sampleBroadcastReceiver: BroadcastReceiver
     private val job = CoroutineScope(Dispatchers.IO).launch {}
 
@@ -97,8 +98,15 @@ class MainActivity : ComponentActivity() {
 //        registerReceiver(sampleBroadcastReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
     }
 
+    override fun onStart() {
+        super.onStart()
+        volumeService = Intent(this, VolumeService::class.java)
+        startService(volumeService)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        stopService(volumeService)
 //        stopService(sampleService)
 //        unregisterReceiver(sampleBroadcastReceiver)
 //        job.cancel()

@@ -32,6 +32,8 @@
         
         <service android:name=".SampleService" android:exported="false" />
 
+        <service android:name=".VolumeService" android:exported="false" android:enabled="true" />
+
         <receiver android:name=".SampleBroadcastReceiver" android:exported="false"
             android:permission="android.permission.BLUETOOTH_CONNECT" >
             <intent-filter>
