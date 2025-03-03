@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Kotlin-driver-board</string>
-    <string name="auth_title">Authorization</string>
-    <string name="auth_plate_number_title">Transport number *</string>
-    <string name="auth_user_name_title">Enter login *</string>
-    <string name="auth_password_title">Enter password *</string>
-    <string name="auth_login_button_title">Sign In</string>
-</resources>

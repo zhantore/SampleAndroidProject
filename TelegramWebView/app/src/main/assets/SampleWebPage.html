@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JavaScript Interface Example</title>
+</head>
+<body>
+
+<h1>Toast Notification Example</h1>
+
+<button onclick="sendToastNotification()">Send notification</button>
+
+<div id="tokenDisplay"></div>
+
+<script>
+    function sendToastNotification() {
+        Android.sendToastNotification("WebView");
+    }
+</script>
+
+</body>
+</html>
