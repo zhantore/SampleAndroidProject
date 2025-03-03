@@ -11,6 +11,4 @@ interface EgovDataSource {
     @GET("proxy/kazakstan_respublikasy_halkyny2?apiKey=2b075120743042c7a67c86b09123382e")
     suspend fun getPopulationInKz(@Query("source")  size: Size): Call<List<PopulationInKz>>
 
-
-//    sdafj
 }
