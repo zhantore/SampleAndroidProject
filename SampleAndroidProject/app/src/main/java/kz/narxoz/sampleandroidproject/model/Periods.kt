@@ -8,4 +8,5 @@ data class Periods(
     val volumePercent: Int,
     val something: String,
     val email: String,
+    val surname: String,
 )
