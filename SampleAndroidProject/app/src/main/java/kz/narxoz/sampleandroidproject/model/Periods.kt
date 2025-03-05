@@ -6,5 +6,4 @@ data class Periods(
     val value: String,
     val title: String,
     val volumePercent: Int,
-    val university: String,
 )
